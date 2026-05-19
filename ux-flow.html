@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CCManager - Flow UX</title>
+    <style>
+      :root {
+        --teal: #00b6ad;
+        --teal-dark: #008f89;
+        --ink: #111820;
+        --muted: #66717c;
+        --line: #dfe8ea;
+        --soft: #f6f8f8;
+        --warning: #fff6d9;
+        --success: #e8f7f3;
+        --danger: #fff0ee;
+        --shadow: 0 12px 28px rgba(17, 24, 32, 0.10);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: #ffffff;
+        font-size: 16px;
+        line-height: 1.4;
+      }
+
+      .page {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 38px 34px 52px;
+      }
+
+      header {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 24px;
+        margin-bottom: 26px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 34px;
+      }
+
+      .subtitle {
+        max-width: 880px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      .quick-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .quick-links a {
+        display: inline-flex;
+        min-height: 38px;
+        align-items: center;
+        padding: 0 14px;
+        border: 1px solid var(--teal);
+        border-radius: 4px;
+        color: var(--teal-dark);
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+
+      .summary-item {
+        min-height: 94px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        background: var(--soft);
+      }
+
+      .summary-item strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 0 10px;
+        border-radius: 4px;
+        background: var(--soft);
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .legend .entry {
+        border-left: 5px solid var(--teal);
+      }
+
+      .legend .decision {
+        border-left: 5px solid #d8a600;
+      }
+
+      .legend .success {
+        border-left: 5px solid #31a66a;
+      }
+
+      .legend .blocked {
+        border-left: 5px solid #c33a2b;
+      }
+
+      .flow-board {
+        display: grid;
+        grid-template-columns: 1fr 58px 1fr 58px 1fr 58px 1fr;
+        gap: 0;
+        align-items: stretch;
+        margin-bottom: 32px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+      }
+
+      .stage {
+        min-width: 250px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        background: #ffffff;
+      }
+
+      .stage + .stage {
+        border-left: 0;
+      }
+
+      .stage h2 {
+        margin: 0 0 14px;
+        font-size: 18px;
+        color: var(--teal-dark);
+      }
+
+      .node {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-left: 5px solid var(--teal);
+        border-radius: 4px;
+        background: #ffffff;
+        box-shadow: var(--shadow);
+      }
+
+      .node + .node {
+        margin-top: 14px;
+      }
+
+      .node h3 {
+        margin: 0 0 7px;
+        font-size: 16px;
+      }
+
+      .node p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .node ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+      }
+
+      .node.decision {
+        border-left-color: #d8a600;
+        background: var(--warning);
+      }
+
+      .node.success {
+        border-left-color: #31a66a;
+        background: var(--success);
+      }
+
+      .node.blocked {
+        border-left-color: #c33a2b;
+        background: var(--danger);
+      }
+
+      .node.secondary {
+        border-left-color: #81919a;
+      }
+
+      .arrow-column {
+        min-width: 58px;
+        display: grid;
+        place-items: center;
+        color: var(--teal-dark);
+        font-weight: 700;
+      }
+
+      .arrow-column span {
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: #ffffff;
+      }
+
+      .flows {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .flow-detail {
+        padding: 18px;
+        border: 1px solid var(--line);
+        background: #ffffff;
+      }
+
+      .flow-detail h2 {
+        margin: 0 0 12px;
+        font-size: 21px;
+      }
+
+      .flow-detail ol {
+        margin: 0;
+        padding-left: 22px;
+      }
+
+      .flow-detail li + li {
+        margin-top: 7px;
+      }
+
+      .note {
+        margin-top: 28px;
+        padding: 18px;
+        border-left: 5px solid var(--teal);
+        background: var(--soft);
+        color: var(--muted);
+      }
+
+      @media (max-width: 980px) {
+        .summary,
+        .flows {
+          grid-template-columns: 1fr;
+        }
+
+        .flow-board {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+
+        .arrow-column {
+          display: none;
+        }
+
+        .stage {
+          min-width: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>Flow UX - Gestion de tarjetas y suscripciones</h1>
+        <p class="subtitle">Mapa del comportamiento propuesto para que el usuario pueda eliminar tarjetas guardadas, cambiar tarjetas asociadas a pagos recurrentes y entender cada bloqueo con una accion clara.</p>
+        <div class="quick-links" aria-label="Enlaces del proyecto">
+          <a href="prototype.html">Abrir prototipo</a>
+          <a href="docs/04-resumen-comportamiento.md">Ver resumen de comportamiento</a>
+        </div>
+      </header>
+
+      <section class="summary" aria-label="Resumen">
+        <div class="summary-item">
+          <strong>Entrada principal</strong>
+          Mis tarjetas guardadas y Mis suscripciones son accesos cruzados, no pantallas aisladas.
+        </div>
+        <div class="summary-item">
+          <strong>Accion clave</strong>
+          Cambiar metodo de pago desde una suscripcion abre un selector de tarjetas con opcion de nueva tarjeta.
+        </div>
+        <div class="summary-item">
+          <strong>Eliminacion</strong>
+          Eliminar intenta completar la accion y solo bloquea si no hay alternativa segura.
+        </div>
+        <div class="summary-item">
+          <strong>Copy</strong>
+          No se usa la etiqueta "No borrable"; se muestra contexto y siguiente paso.
+        </div>
+      </section>
+
+      <section class="legend" aria-label="Leyenda">
+        <span class="entry">Pantalla / entrada</span>
+        <span class="decision">Decision de sistema</span>
+        <span class="success">Resultado correcto</span>
+        <span class="blocked">Bloqueo contextual</span>
+      </section>
+
+      <section class="flow-board" aria-label="Tablero de flujo principal">
+        <div class="stage">
+          <h2>1. Entrada</h2>
+          <article class="node">
+            <h3>Mis tarjetas guardadas</h3>
+            <p>Lista tarjetas, estado predeterminado, uso en suscripciones y acciones por fila.</p>
+          </article>
+          <article class="node">
+            <h3>Mis suscripciones</h3>
+            <p>Lista suscripciones con fecha de renovacion, tarjeta asociada y acciones.</p>
+          </article>
+        </div>
+
+        <div class="arrow-column"><span>-&gt;</span></div>
+
+        <div class="stage">
+          <h2>2. Acciones</h2>
+          <article class="node">
+            <h3>Eliminar tarjeta</h3>
+            <p>La accion esta siempre visible junto a la tarjeta.</p>
+          </article>
+          <article class="node">
+            <h3>Seleccionar predeterminada</h3>
+            <p>Marca otra tarjeta como metodo por defecto del usuario.</p>
+          </article>
+          <article class="node">
+            <h3>Cambiar metodo de pago</h3>
+            <p>Desde suscripciones, abre modal con tarjetas guardadas y "Añadir nueva".</p>
+          </article>
+        </div>
+
+        <div class="arrow-column"><span>-&gt;</span></div>
+
+        <div class="stage">
+          <h2>3. Decisiones</h2>
+          <article class="node decision">
+            <h3>Tarjeta sin suscripcion</h3>
+            <p>Se puede borrar directamente.</p>
+          </article>
+          <article class="node decision">
+            <h3>Vinculada + hay predeterminada</h3>
+            <p>Se borra y la suscripcion pasa a la tarjeta predeterminada.</p>
+          </article>
+          <article class="node blocked">
+            <h3>Vinculada + sin predeterminada</h3>
+            <p>Se bloquea con mensaje y acceso a Mis suscripciones.</p>
+          </article>
+        </div>
+
+        <div class="arrow-column"><span>-&gt;</span></div>
+
+        <div class="stage">
+          <h2>4. Resultados</h2>
+          <article class="node success">
+            <h3>Tarjeta eliminada</h3>
+            <p>La lista se actualiza y se informa la accion completada.</p>
+          </article>
+          <article class="node success">
+            <h3>Suscripcion actualizada</h3>
+            <p>La tarjeta asociada queda cambiada para la siguiente renovacion.</p>
+          </article>
+          <article class="node secondary">
+            <h3>Resolver bloqueo</h3>
+            <p>El usuario va a Mis suscripciones para asignar otra tarjeta o cancelar la renovacion.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="flows" aria-label="Flujos detallados">
+        <article class="flow-detail">
+          <h2>Flujo A - Cambiar tarjeta de suscripcion</h2>
+          <ol>
+            <li>El usuario entra en Mis suscripciones.</li>
+            <li>Ve la propiedad Tarjeta asociada bajo la fecha de renovacion.</li>
+            <li>Pulsa Cambiar metodo de pago.</li>
+            <li>Selecciona una tarjeta guardada o añade una nueva.</li>
+            <li>La suscripcion se actualiza y se muestra confirmacion.</li>
+          </ol>
+        </article>
+
+        <article class="flow-detail">
+          <h2>Flujo B - Eliminar tarjeta vinculada</h2>
+          <ol>
+            <li>El usuario pulsa Eliminar junto a una tarjeta.</li>
+            <li>El sistema comprueba si esta vinculada a pagos recurrentes.</li>
+            <li>Si existe otra tarjeta predeterminada, reasigna la suscripcion a esa tarjeta.</li>
+            <li>Elimina la tarjeta original.</li>
+            <li>Muestra el mensaje de reasignacion completada.</li>
+          </ol>
+        </article>
+
+        <article class="flow-detail">
+          <h2>Flujo C - Bloqueo contextual</h2>
+          <ol>
+            <li>El usuario intenta eliminar una tarjeta vinculada.</li>
+            <li>No existe otra tarjeta predeterminada disponible.</li>
+            <li>Se muestra el mensaje de bloqueo con explicacion.</li>
+            <li>El usuario puede ir a Mis suscripciones o cerrar.</li>
+            <li>Desde Mis suscripciones cambia tarjeta o cancela renovacion.</li>
+          </ol>
+        </article>
+
+        <article class="flow-detail">
+          <h2>Flujo D - Definir predeterminada</h2>
+          <ol>
+            <li>El usuario entra en Mis tarjetas guardadas.</li>
+            <li>Pulsa Seleccionar como predeterminado junto a una tarjeta.</li>
+            <li>El sistema actualiza el metodo predeterminado.</li>
+            <li>La etiqueta Predeterminada se mueve a la tarjeta elegida.</li>
+            <li>El nuevo default queda disponible como fallback de suscripciones.</li>
+          </ol>
+        </article>
+      </section>
+
+      <aside class="note">
+        Este flujo asume que el backend puede conocer las suscripciones que dependen de cada tarjeta y puede reasignar una suscripcion al metodo de pago predeterminado cuando se elimina su tarjeta actual. Si esa reasignacion requiere confirmacion explicita o autenticacion adicional, debe añadirse como paso intermedio.
+      </aside>
+    </main>
+  </body>
+</html>
