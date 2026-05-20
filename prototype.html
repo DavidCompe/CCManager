@@ -11,15 +11,15 @@
       <aside class="sidebar" aria-label="Navegación de cuenta">
         <button class="side-link" type="button">Mis datos</button>
         <button class="side-link" type="button">Mis productos</button>
-        <button class="side-link is-active" type="button" data-view-button="subscriptions">Mis suscripciones</button>
+        <button class="side-link" type="button" data-view-button="subscriptions">Mis suscripciones</button>
         <button class="side-link" type="button">Mis pedidos</button>
-        <button class="side-link" type="button" data-view-button="payments">Mis tarjetas guardadas</button>
+        <button class="side-link is-active" type="button" data-view-button="payments">Mis tarjetas guardadas</button>
         <button class="side-link" type="button">Support</button>
         <button class="register-button" type="button">Registrar mis Productos</button>
       </aside>
 
       <main class="main-content">
-        <section class="view is-visible" id="subscriptions-view" aria-labelledby="subscriptions-title">
+        <section class="view" id="subscriptions-view" aria-labelledby="subscriptions-title">
           <div class="product-tabs" aria-label="Categorías de productos">
             <button class="product-tab" type="button">Mis GPS</button>
             <button class="product-tab" type="button">Mis softwares</button>
@@ -29,7 +29,7 @@
           <div class="subscription-list" id="subscription-list"></div>
         </section>
 
-        <section class="view" id="payments-view" aria-labelledby="payments-title">
+        <section class="view is-visible" id="payments-view" aria-labelledby="payments-title">
           <div class="panel">
             <div class="panel-header">
               <h1 id="payments-title">Mis tarjetas guardadas</h1>

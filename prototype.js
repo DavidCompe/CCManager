@@ -1,5 +1,5 @@
 const state = {
-  view: "subscriptions",
+  view: "payments",
   activeSubscriptionId: null,
   nextCardNumber: 1,
   cards: [
