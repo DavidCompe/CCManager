@@ -113,7 +113,7 @@ function renderSubscriptions() {
         <button class="action-link" type="button">Más información</button>
         <span aria-hidden="true">|</span>
         <button class="action-link" type="button" data-cancel-renewal="${subscription.id}">Cancelar renovación</button>
-        <button class="change-payment-button" type="button" data-change-payment="${subscription.id}">Cambiar método de pago</button>
+        <button class="change-payment-button added-highlight" type="button" data-change-payment="${subscription.id}">Cambiar tarjeta</button>
         <div class="price">${subscription.price}</div>
       `
       : `<button class="action-link" type="button">Más información</button>`;
@@ -128,7 +128,7 @@ function renderSubscriptions() {
             <div class="detail-row"><strong>Estado:</strong> ${subscription.status}</div>
             <div class="detail-row"><strong>Suscripción:</strong> ${subscription.type}</div>
             <div class="detail-row"><strong>${subscription.renewalLabel}:</strong> ${subscription.renewalDate}</div>
-            <div class="detail-row associated-card"><strong>Tarjeta asociada:</strong> <span>${cardLabel(associatedCard)}</span></div>
+            <div class="detail-row associated-card added-highlight"><strong>Tarjeta vinculada:</strong> <span>${cardLabel(associatedCard)}</span></div>
             <div class="detail-row"><strong>Activaciones en dispositivos:</strong> ${subscription.devices} | <button class="inline-link" type="button">Lista de dispositivos</button></div>
           </div>
           <div class="subscription-actions">

@@ -10,6 +10,10 @@
   --button-dark: #222222;
   --danger: #c33a2b;
   --warning-bg: #eef7f6;
+  --functional-bg: #e7f8f7;
+  --functional-accent: #00b6ad;
+  --addition-bg: #fff4db;
+  --addition-accent: #e7a321;
   --shadow: 0 14px 34px rgba(16, 24, 32, 0.16);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -65,6 +69,27 @@ button {
 .side-link.is-active {
   border-left-color: var(--teal);
   color: var(--teal);
+}
+
+.side-link.functional-highlight {
+  position: relative;
+  padding: 10px 12px 11px 16px;
+  border-radius: 0 8px 8px 0;
+  background: var(--functional-bg);
+  box-shadow: inset 0 0 0 1px rgba(0, 182, 173, 0.24);
+  font-weight: 700;
+}
+
+.side-link.functional-highlight::after {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--functional-accent);
+  content: "";
+  transform: translateY(-50%);
 }
 
 .register-button {
@@ -248,7 +273,15 @@ button {
 }
 
 .associated-card {
-  margin-top: 2px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  align-items: baseline;
+  margin-top: 8px;
+  padding: 7px 11px;
+  border: 1px dashed var(--addition-accent);
+  border-radius: 4px;
+  background: var(--addition-bg);
 }
 
 .associated-card span {
@@ -273,11 +306,12 @@ button {
 .change-payment-button {
   min-height: 40px;
   padding: 4px 13px;
-  border: 1px solid var(--teal);
+  border: 1px solid var(--addition-accent);
   border-radius: 4px;
-  background: #ffffff;
-  color: var(--teal);
+  background: var(--addition-bg);
+  color: #805a0b;
   font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(231, 163, 33, 0.22);
 }
 
 .price {
@@ -703,6 +737,15 @@ button {
     border-left: 0;
     border-bottom: 3px solid transparent;
     font-size: 16px;
+  }
+
+  .side-link.functional-highlight {
+    padding-right: 30px;
+    border-radius: 4px;
+  }
+
+  .side-link.functional-highlight::after {
+    right: 10px;
   }
 
   .side-link.is-active {
