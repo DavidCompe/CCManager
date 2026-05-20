@@ -2,6 +2,7 @@ const state = {
   view: "payments",
   activeSubscriptionId: null,
   nextCardNumber: 1,
+  nextSubscriptionNumber: 1,
   cards: [
     {
       id: "card_visa_9258",
@@ -106,13 +107,18 @@ function renderNavigation() {
 }
 
 function renderSubscriptions() {
+  if (!state.subscriptions.length) {
+    els.subscriptionList.innerHTML = `<p class="empty-state">No tienes suscripciones activas.</p>`;
+    return;
+  }
+
   els.subscriptionList.innerHTML = state.subscriptions.map((subscription) => {
     const associatedCard = getCard(subscription.paymentMethodId);
     const actions = subscription.canRenew
       ? `
         <button class="action-link" type="button">Más información</button>
         <span aria-hidden="true">|</span>
-        <button class="action-link" type="button" data-cancel-renewal="${subscription.id}">Cancelar renovación</button>
+        <button class="action-link" type="button" data-cancel-subscription="${subscription.id}">Cancelar suscripción</button>
         <button class="change-payment-button added-highlight" type="button" data-change-payment="${subscription.id}">Cambiar tarjeta</button>
         <div class="price">${subscription.price}</div>
       `
@@ -247,7 +253,7 @@ function assignCardToSubscription(cardId, subscriptionId = state.activeSubscript
   showToast(`La próxima renovación de ${subscription.name} se cobrará en ${cardLabel(card)}.`);
 }
 
-function addStoredCard({ assignToActiveSubscription = false } = {}) {
+function createStoredCard() {
   const newCard = {
     id: `card_new_${Date.now()}`,
     brand: "Visa",
@@ -259,6 +265,12 @@ function addStoredCard({ assignToActiveSubscription = false } = {}) {
   state.nextCardNumber += 1;
   state.cards.push(newCard);
 
+  return newCard;
+}
+
+function addStoredCard({ assignToActiveSubscription = false } = {}) {
+  const newCard = createStoredCard();
+
   if (assignToActiveSubscription && state.activeSubscriptionId) {
     assignCardToSubscription(newCard.id);
     return;
@@ -266,6 +278,51 @@ function addStoredCard({ assignToActiveSubscription = false } = {}) {
 
   renderAll();
   showToast(`Tarjeta ${cardLabel(newCard)} guardada.`);
+}
+
+function getPrototypeRenewalDate() {
+  const renewalDate = new Date();
+  renewalDate.setMonth(renewalDate.getMonth() + 1);
+
+  return renewalDate.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  }).replaceAll("/", "-");
+}
+
+function addTrialSubscription() {
+  const defaultCard = getDefaultCard() || state.cards[0] || createStoredCard();
+  const subscriptionNumber = state.nextSubscriptionNumber;
+
+  state.nextSubscriptionNumber += 1;
+  state.subscriptions.unshift({
+    id: `sub_proto_${Date.now()}_${subscriptionNumber}`,
+    name: `Suscripción de prueba ${subscriptionNumber}`,
+    status: "Activo",
+    type: "Mensual",
+    renewalLabel: "Fecha de renovación",
+    renewalDate: getPrototypeRenewalDate(),
+    devices: "1 de 5",
+    price: "0,00 € / Prueba",
+    paymentMethodId: defaultCard ? defaultCard.id : null,
+    canRenew: true,
+    art: subscriptionNumber % 2 === 0 ? "map" : "badge"
+  });
+
+  renderAll();
+  switchView("subscriptions");
+  openMessageModal({
+    title: "Proto",
+    body: "En este prototipo este botón añade directamente una suscripción al usuario, para que se puedan probar los flujos de tarjetas.",
+    actions: [
+      {
+        label: "Entendido",
+        variant: "primary",
+        handler: closeMessageModal
+      }
+    ]
+  });
 }
 
 function setDefaultCard(cardId) {
@@ -353,6 +410,45 @@ function removeCard(cardId) {
   state.cards = state.cards.filter((card) => card.id !== cardId);
 }
 
+function confirmCancelSubscription(subscriptionId) {
+  const subscription = state.subscriptions.find((item) => item.id === subscriptionId);
+
+  if (!subscription) {
+    return;
+  }
+
+  openMessageModal({
+    title: "Cancelar suscripción",
+    body: `¿Seguro que quieres cancelar ${subscription.name}? La suscripción desaparecerá de la lista y la tarjeta vinculada quedará liberada.`,
+    actions: [
+      {
+        label: "Cancelar suscripción",
+        variant: "danger",
+        handler: () => cancelSubscription(subscriptionId)
+      },
+      {
+        label: "Volver",
+        variant: "secondary",
+        handler: closeMessageModal
+      }
+    ]
+  });
+}
+
+function cancelSubscription(subscriptionId) {
+  const subscription = state.subscriptions.find((item) => item.id === subscriptionId);
+
+  if (!subscription) {
+    closeMessageModal();
+    return;
+  }
+
+  state.subscriptions = state.subscriptions.filter((item) => item.id !== subscriptionId);
+  closeMessageModal();
+  renderAll();
+  showToast(`${subscription.name} cancelada. La tarjeta vinculada queda liberada.`);
+}
+
 function openMessageModal({ title, body, actions }) {
   els.messageTitle.textContent = title;
   els.messageBody.textContent = body;
@@ -361,7 +457,11 @@ function openMessageModal({ title, body, actions }) {
   actions.forEach((action) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = action.variant === "primary" ? "primary-button" : "secondary-button";
+    button.className = action.variant === "primary"
+      ? "primary-button"
+      : action.variant === "danger"
+        ? "danger-button"
+        : "secondary-button";
     button.textContent = action.label;
     button.addEventListener("click", action.handler);
     els.messageActions.appendChild(button);
@@ -388,11 +488,12 @@ function showToast(message) {
 document.addEventListener("click", (event) => {
   const viewButton = event.target.closest("[data-view-button]");
   const changePaymentButton = event.target.closest("[data-change-payment]");
-  const cancelRenewalButton = event.target.closest("[data-cancel-renewal]");
+  const cancelSubscriptionButton = event.target.closest("[data-cancel-subscription]");
   const assignCardButton = event.target.closest("[data-assign-card]");
   const deleteCardButton = event.target.closest("[data-delete-card]");
   const setDefaultButton = event.target.closest("[data-set-default]");
   const goSubscriptionsButton = event.target.closest("[data-go-subscriptions]");
+  const addTrialSubscriptionButton = event.target.closest("[data-add-trial-subscription]");
 
   if (viewButton) {
     switchView(viewButton.dataset.viewButton);
@@ -402,9 +503,8 @@ document.addEventListener("click", (event) => {
     openPaymentModal(changePaymentButton.dataset.changePayment);
   }
 
-  if (cancelRenewalButton) {
-    const subscription = state.subscriptions.find((item) => item.id === cancelRenewalButton.dataset.cancelRenewal);
-    showToast(`Prototipo: abriría la confirmación para cancelar la renovación de ${subscription.name}.`);
+  if (cancelSubscriptionButton) {
+    confirmCancelSubscription(cancelSubscriptionButton.dataset.cancelSubscription);
   }
 
   if (assignCardButton) {
@@ -421,6 +521,10 @@ document.addEventListener("click", (event) => {
 
   if (goSubscriptionsButton) {
     switchView("subscriptions");
+  }
+
+  if (addTrialSubscriptionButton) {
+    addTrialSubscription();
   }
 
   if (event.target.matches("[data-close-modal]") || event.target === els.paymentModal) {

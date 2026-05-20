@@ -145,6 +145,13 @@ button {
   background: #ffffff;
 }
 
+.empty-state {
+  margin: 0;
+  padding: 28px 32px;
+  color: var(--muted);
+  font-size: 22px;
+}
+
 .subscription-item {
   padding: 34px 32px 25px;
 }
@@ -677,6 +684,121 @@ button {
 .message-modal p {
   margin-bottom: 0;
   color: #24313a;
+}
+
+@media (max-width: 1500px) {
+  body {
+    font-size: 16px;
+  }
+
+  .app-shell {
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    padding: 44px 18px 24px;
+  }
+
+  .side-link {
+    font-size: 22px;
+  }
+
+  .side-link + .side-link {
+    margin-top: 10px;
+  }
+
+  .side-link.functional-highlight {
+    padding: 8px 34px 9px 16px;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .register-button {
+    min-height: 56px;
+    margin-top: 34px;
+    font-size: 18px;
+  }
+
+  .main-content {
+    padding: 42px 30px 52px;
+  }
+
+  .product-tabs {
+    gap: 12px;
+    margin: 12px 0 24px;
+  }
+
+  .product-tab {
+    min-height: 54px;
+    padding: 0 14px;
+    font-size: 21px;
+  }
+
+  .subscription-item {
+    padding: 28px 24px 22px;
+  }
+
+  .subscription-item h2,
+  .panel-header h1,
+  .panel-header h2 {
+    font-size: 22px;
+  }
+
+  .item-divider {
+    margin: 14px 0 24px;
+  }
+
+  .subscription-body {
+    grid-template-columns: 132px minmax(260px, 1fr);
+    gap: 22px 24px;
+  }
+
+  .subscription-art {
+    width: 132px;
+  }
+
+  .subscription-details,
+  .subscription-actions {
+    font-size: 20px;
+  }
+
+  .associated-card {
+    padding: 6px 10px;
+  }
+
+  .subscription-actions {
+    grid-column: 2;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px 14px;
+    white-space: normal;
+  }
+
+  .change-payment-button {
+    min-height: 36px;
+    padding: 4px 11px;
+  }
+
+  .price {
+    width: 100%;
+    margin-top: 6px;
+    text-align: left;
+  }
+
+  .panel-header {
+    min-height: 68px;
+    padding: 20px 22px 16px;
+  }
+
+  .payment-list {
+    padding: 22px;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .danger-button {
+    min-height: 44px;
+    padding: 0 16px;
+  }
 }
 
 @media (max-width: 1100px) {
